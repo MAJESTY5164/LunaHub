@@ -1,0 +1,154 @@
+Version = "1.0"
+lunaname = "NX"
+getgenv().lunainvite = "getluna"
+
+--vars
+exec = identifyexecutor()
+
+getgenv().loadhub = function()
+Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+Window = Rayfield:CreateWindow({
+    Name = "Luna Hub | v" .. Version,
+    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+    LoadingTitle = "Luna Hub",
+    LoadingSubtitle = "made by MAJESTY & Lite",
+    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+    
+    DisableRayfieldPrompts = true,
+    DisableBuildWarnings = true, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+    
+    ConfigurationSaving = {
+    Enabled = false,
+    FolderName = nil, -- Create a custom folder for your hub/game
+    FileName = "Big Hub"
+    },
+    
+    Discord = {
+    Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+    Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+    RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+    },
+})
+
+Main = Window:CreateTab("Main", "info")
+Universal = Window:CreateTab("Universal's", "settings")
+Specific = Window:CreateTab("Scripts", "settings")
+
+Main:CreateButton({
+    Name = "Join the discord!",
+    Callback = function()
+
+local requestData = {
+    cmd = 'INVITE_BROWSER',
+    args = { code = getgenv().lunainvite },
+    nonce = game:GetService("HttpService"):GenerateGUID(false)
+}
+
+local success, response = pcall((syn and syn.request) or http and http.request or http_request or (fluxus and fluxus.request) or request, {
+    Url = 'http://127.0.0.1:6463/rpc?v=1',
+    Method = 'POST',
+    Headers = { ['Content-Type'] = 'application/json', ['Origin'] = 'https://discord.com' },
+    Body = game:GetService("HttpService"):JSONEncode(requestData)
+})     
+
+    end,
+ })
+
+Main:CreateParagraph({Title = "Information", Content = "Luna Hub is a hub created by MAJESTY and Lite using community scripts from the luna discord this Hub is made for luna and my not work on other executors"})
+Main:CreateParagraph({Title = "Change Logs", Content = "N/A"})
+
+Universal_Scripts = {
+    -- script name, url,
+    "Infinite Yeild", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+}
+
+Scripts = {
+    -- NewGameType, Game Name,
+    -- script name, url,
+    "NewGameType", "Arsenal",
+    "Modded Guns - By MAJESTY", "https://raw.githubusercontent.com/MAJESTY1117/w/refs/heads/main/w",
+}
+
+function create_Universal(name, url)
+    Button = Universal:CreateButton({
+        Name = name,
+        Callback = function()
+                loadstring(game:HttpGet(url))()
+        end,
+        })
+end
+
+function create_Script(name, url)
+    if name == "NewGameType" then
+        Specific:CreateSection(url)
+    else
+        Button = Specific:CreateButton({
+            Name = name,
+            Callback = function()
+                    loadstring(game:HttpGet(url))()
+            end,
+            })
+        end
+end
+
+i = 1
+
+while i <= #Universal_Scripts do
+    create_Universal(Universal_Scripts[i], Universal_Scripts[i+1])
+    i = i + 3
+end
+
+i = 1
+
+while i <= #Scripts do
+    create_Script(Scripts[i], Scripts[i+1])
+    i = i + 2
+end
+end
+
+getgenv().prompt = function()
+    local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "PopupGUI"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local popupFrame = Instance.new("Frame")
+popupFrame.Size = UDim2.new(0, 300, 0, 200)
+popupFrame.Position = UDim2.new(0.6, -150, 0.5, -100)
+popupFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+popupFrame.BorderSizePixel = 0
+popupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+popupFrame.Parent = gui
+
+local popupText = Instance.new("TextLabel")
+popupText.Size = UDim2.new(1, -20, 0.6, -20)
+popupText.Position = UDim2.new(0, 10, 0, 10)
+popupText.BackgroundTransparency = 1
+popupText.Text = "This Hub was designed for Luna and " .. exec .. " may not support it"
+popupText.TextColor3 = Color3.fromRGB(255, 255, 255)
+popupText.TextScaled = true
+popupText.Font = Enum.Font.SourceSans
+popupText.Parent = popupFrame
+
+local continueButton = Instance.new("TextButton")
+continueButton.Size = UDim2.new(0.5, 0, 0.2, 0)
+continueButton.Position = UDim2.new(0.25, 0, 0.7, 0)
+continueButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+continueButton.Text = "Continue"
+continueButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+continueButton.TextScaled = true
+continueButton.Font = Enum.Font.SourceSans
+continueButton.Parent = popupFrame
+
+continueButton.MouseButton1Click:Connect(function()
+    gui:Destroy()
+    getgenv().loadhub()
+end)
+end
+
+if exec ~= lunaname then
+getgenv().prompt()
+else
+getgenv().loadhub()
+end
